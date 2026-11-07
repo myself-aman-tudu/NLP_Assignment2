@@ -1,0 +1,32 @@
+\section{Task 2 - MuRIL Fine-Tuning}
+
+Fine-tuned on raw tweets, MuRIL gets a test macro-F1 of 0.606, above Task 1. Normalizing only the test tweets slightly improves it, to 0.609.
+
+\subsection*{Setup}
+\begin{itemize}
+    \item \textbf{Model:} \texttt{google/muril-base-cased} with a new 3-class head on the pooled \texttt{[CLS]} output (\texttt{AutoModelForSequenceClassification}, 238M parameters, all fine-tuned).
+    \item \textbf{Input:} the raw tweets, with no Dakshina normalization. The tweets have at most 49 subwords (29.7 on average), so nothing is cut at the 128 limit.
+    \item \textbf{Training:} exactly as the assignment specifies: AdamW at a constant learning rate of 2e-5 (PyTorch defaults otherwise), batch size 16, 4 epochs (1,232 steps), seed 42, on a Colab T4 GPU. We evaluate the model after epoch 4.
+    \item \textbf{Additional check:} the same model, without retraining, on the test tweets normalized with the Task 1 dictionary.
+\end{itemize}
+
+\subsection*{Results on the test split}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}ll@{}}
+        \toprule
+        \textbf{Test input} & \textbf{Macro-F1} \\
+        \midrule
+        Raw (as trained) & 0.606 \\
+        Normalized at test time & 0.609 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Task 2 macro-F1 metrics.}
+    \label{tab:task2_results}
+\end{table}
+
+\subsection*{Discussion}
+\begin{itemize}
+    \item MuRIL beats the whole Task 1 pipeline with no language tagging or normalization at all.
+    \item Normalizing the test tweets resulted in a very slight improvement ($+0.003$). This suggests the model learned raw spellings well enough, but standardizing some messy inputs at test time offered a small benefit without causing significant disruption.
+\end{itemize}

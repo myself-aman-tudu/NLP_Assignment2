@@ -1,0 +1,14 @@
+\section{Introduction}
+
+MuRIL fine-tuned on raw tweets is our best system, with a test macro-F1 of 0.606 on SentiMix Partition A. The LID-augmented MuRIL gets 0.598 and the classical pipeline 0.583.
+
+Code-mixed tweets mix Romanized Hindi and English in one sentence, e.g., ``yeh movie bahut acchi thi, must watch!''. Most NLP tools expect one language and one spelling, so they struggle with this. Our task is to label each tweet as negative, neutral, or positive.
+
+We built three systems:
+\begin{itemize}
+    \item \textbf{Task 1 - classical baseline:} word-level language ID (LID), spelling normalization with the Dakshina lexicon~\cite{roark2020dakshina}, and a TF-IDF + Random Forest classifier.
+    \item \textbf{Task 2 - paper reproduction:} MuRIL~\cite{khanuja2021muril} fine-tuned on raw tweets, plus a check where only the test tweets are normalized.
+    \item \textbf{Task 3 - combine and improve:} MuRIL with Task 1's language tags added as a learned embedding for every subword.
+\end{itemize}
+
+Tasks 2 and 3 fine-tune the same MuRIL checkpoint~\cite{khanuja2021muril}. Task 3 takes its input from Task 1's saved tags and normalized text.

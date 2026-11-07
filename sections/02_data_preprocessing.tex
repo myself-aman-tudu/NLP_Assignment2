@@ -1,0 +1,35 @@
+\section{Data and Preprocessing}
+
+After removing duplicates, the pool has 18,480 labelled tweets. Partition A is one third of it: 4,928 train, 616 validation and 616 test tweets.
+
+\subsection*{Sources}
+\begin{itemize}
+    \item \textbf{SentiMix:} \texttt{Train.txt}, \texttt{Validation.txt} and \texttt{Test.txt} (tokenized tweets with a language tag per token), plus \texttt{Ty.txt} (the test labels), all from the GitHub repository \texttt{singhnivedita/SemEval2020-Task9}.
+    \item \textbf{Dakshina:} only the Hindi word-pair lexicon (\texttt{hi.translit.sampled.\{train, dev, test\}.tsv}, all three files combined). For each Devanagari word, it lists the Roman spellings people used and how often.
+\end{itemize}
+
+\subsection*{Steps}
+\begin{enumerate}
+    \item \textbf{Parse each file into tweets.} A header line has to match \texttt{meta\textbackslash t id\textbackslash t sentiment} exactly, because tokens like \textit{metaphysist} also start with ``meta''. The test labels are attached from \texttt{Ty.txt} by id.
+    \item \textbf{Map the tags:} \texttt{Hin} $\rightarrow$ \texttt{hi}, \texttt{Eng} $\rightarrow$ \texttt{en}, and \texttt{O} or \texttt{EMT} (emoji) $\rightarrow$ \texttt{univ}. Six broken tags are cleaned the same way.
+    \item \textbf{Remove duplicates:} 2,650 ids appear in both Train and Validation, so we keep the first copy (21,130 $\rightarrow$ 18,480 tweets).
+    \item \textbf{URLs, usernames and emojis:} URL pieces like \texttt{https // t co / abc} are removed. Usernames (\texttt{@name}, \texttt{@ part \_ part}) become one \texttt{@user} token tagged \texttt{univ}. Emojis and hashtags are kept. All three tasks use the same cleaned tokens.
+    \item \textbf{Partition:} shuffle the pool once with \texttt{numpy.random.default\_rng(42)}, cut it into three equal parts (A, B, C) and split A 80/10/10.
+\end{enumerate}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{@{}lcccc@{}}
+        \toprule
+        \textbf{Split} & \textbf{Tweets} & \textbf{Negative} & \textbf{Neutral} & \textbf{Positive} \\
+        \midrule
+        Train & 4,928 & 1,468 & 1,782 & 1,678 \\
+        Validation & 616 & 163 & 222 & 231 \\
+        Test & 616 & 167 & 253 & 196 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Class distribution for Partition A.}
+    \label{tab:partition_a}
+\end{table}
+
+\textbf{Seed.} The assignment asks for one seed shared by the whole class but doesn't give it, so we use 42.

@@ -1,0 +1,21 @@
+\section{Reproducibility}
+
+Ensuring that our results are robust and independently verifiable is a critical component of this project. To facilitate this, the entire pipeline—from raw data ingestion to the final performance visualization—has been integrated into a single, self-contained Google Colab notebook. 
+
+\subsection*{Execution Environment and Steps}
+The notebook is designed for minimal setup and seamless execution:
+\begin{enumerate}
+    \item \textbf{Environment:} The project relies on the Google Colab environment. Because all tasks are consolidated into one notebook, there are no complex local environments to configure.
+    \item \textbf{Hardware Acceleration:} For the deep learning components (Task 2 and Task 3), a T4 GPU runtime is required to efficiently fine-tune the MuRIL model. Task 1 (the classical baseline) can execute on a standard CPU, but running the entire notebook sequentially on a GPU runtime is the recommended approach.
+    \item \textbf{Execution Flow:} The notebook features an interactive file upload cell that pauses execution until the required dataset files are provided. Once the data is loaded, users can simply select ``Run All'' to execute the data partitioning, the classical pipeline, the MuRIL fine-tuning, and the LID-augmented MuRIL training sequentially.
+\end{enumerate}
+
+\subsection*{Stochasticity and Seeding}
+To guarantee that the exact metrics reported in this document (such as the macro-F1 score of 0.606 for Task 2) can be perfectly reproduced, all sources of stochasticity have been controlled. A master random seed of \textbf{42} is enforced globally across the pipeline. This seed governs:
+\begin{itemize}
+    \item The initial random shuffle of the deduplicated tweet pool prior to creating Partition A.
+    \item The initialization and optimization of the Scikit-Learn \texttt{LogisticRegression} and \texttt{RandomForestClassifier} models in Task 1.
+    \item The weight initialization for the custom classification head added to the pretrained MuRIL checkpoint.
+    \item The randomized batch sampling order utilized by the HuggingFace Trainer and the custom PyTorch \texttt{DataLoader} during epochs.
+\end{itemize}
+Repeated end-to-end executions of the notebook have yielded mathematically identical F1 scores across all three tasks, confirming the deterministic nature of the implemented pipeline.
